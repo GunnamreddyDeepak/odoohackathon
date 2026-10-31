@@ -1,4 +1,6 @@
+
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { logoutUser } from '../services/api'
 
 const menuItems = [
   { name: 'Dashboard', path: '/dashboard', icon: '▦' },
@@ -12,9 +14,13 @@ const menuItems = [
 const Layout = () => {
   const navigate = useNavigate()
 
+  const handleLogout = () => {
+    logoutUser()
+    navigate('/login', { replace: true })
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 lg:flex">
-
       <aside className="w-full bg-[#0b1930] p-6 text-white lg:min-h-screen lg:w-64">
         <div className="mb-10 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold">
@@ -54,7 +60,7 @@ const Layout = () => {
         </div>
 
         <button
-          onClick={() => navigate('/login')}
+          onClick={handleLogout}
           className="mt-8 w-full rounded-xl px-4 py-3 text-left text-sm text-slate-300 hover:bg-white/10"
         >
           ↪ Sign out
