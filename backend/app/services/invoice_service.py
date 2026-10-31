@@ -109,6 +109,7 @@ def create_invoice(db: Session, data):
         )
 
         # 3. Resolve tax rule.
+        tax_rule = None
         tax_rate = money(0)
 
         if data.tax_rule_code:
@@ -215,6 +216,9 @@ def create_invoice(db: Session, data):
             invoice_number=f"INV-{uuid4().hex[:16].upper()}",
             customer_id=data.customer_id,
             subscription_id=data.subscription_id,
+            discount_id=discount.id if discount else None,
+            tax_rule_id=tax_rule.id if tax_rule else None,
+            tax_rate=tax_rate,
             issue_date=data.issue_date,
             due_date=data.due_date,
             currency=data.currency,
@@ -240,19 +244,6 @@ def create_invoice(db: Session, data):
                     line_total=line["line_total"],
                 )
             )
-
-        # 8. Record discount usage and increment usage count.
-        if discount is not None:
-            db.add(
-                DiscountUsage(
-                    discount_id=discount.id,
-                    invoice_id=invoice.id,
-                    customer_id=data.customer_id,
-                    discount_amount=calculations["discount"],
-                )
-            )
-
-            discount.usage_count += 1
 
         # 9. Commit everything together.
         db.commit()

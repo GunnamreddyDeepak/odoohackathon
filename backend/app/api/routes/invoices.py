@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_staff
-from app.models import Customer, Invoice, User
+from app.models import Customer, Invoice, User, Discount, DiscountUsage
 from app.schemas.invoice import (
     InvoiceCreate,
     InvoiceResponse,
@@ -117,10 +117,12 @@ def update_invoice_status(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_staff),
 ):
+    # Lock the invoice so concurrent requests cannot confirm it twice.
     invoice = (
         db.query(Invoice)
         .options(selectinload(Invoice.lines))
         .filter(Invoice.id == invoice_id)
+        .with_for_update()
         .first()
     )
 
@@ -136,16 +138,61 @@ def update_invoice_status(
             detail="Only draft invoices can change status",
         )
 
-    invoice.status = data.status
-
     try:
+        # Consume discount usage only when confirming.
+        if data.status == "CONFIRMED" and invoice.discount_id is not None:
+            discount = (
+                db.query(Discount)
+                .filter(Discount.id == invoice.discount_id)
+                .with_for_update()
+                .first()
+            )
+
+            if not discount:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Invoice discount no longer exists",
+                )
+
+            existing_usage = db.query(DiscountUsage).filter(
+                DiscountUsage.invoice_id == invoice.id,
+                DiscountUsage.discount_id == discount.id,
+            ).first()
+
+            # Avoid consuming the same discount twice.
+            if not existing_usage:
+                if (
+                    discount.usage_limit is not None
+                    and discount.usage_count >= discount.usage_limit
+                ):
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail="Discount usage limit reached; invoice cannot be confirmed",
+                    )
+
+                db.add(
+                    DiscountUsage(
+                        discount_id=discount.id,
+                        invoice_id=invoice.id,
+                        customer_id=invoice.customer_id,
+                        discount_amount=invoice.discount_amount,
+                    )
+                )
+                discount.usage_count += 1
+
+        invoice.status = data.status
         db.commit()
         db.refresh(invoice)
+
         return invoice
+
+    except HTTPException:
+        db.rollback()
+        raise
 
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid invoice status update",
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Invoice status update conflict",
         )

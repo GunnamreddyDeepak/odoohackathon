@@ -1,4 +1,4 @@
-
+﻿
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes.users import router as users_router
@@ -11,6 +11,8 @@ from app.api.routes.subscription_plans import router as subscription_plans_route
 from app.api.routes.subscriptions import router as subscriptions_router
 from app.api.routes.subscription_lines import router as subscription_lines_router
 from app.api.routes.invoices import router as invoices_router
+from app.api.routes.payments import router as payments_router
+from app.api.routes.billing import router as recurring_billing_router
 
 app = FastAPI(
     title="Brightloop Subscription Management API",
@@ -41,6 +43,8 @@ app.include_router(subscription_lines_router, prefix=API_PREFIX)
 app.include_router(users_router, prefix=API_PREFIX)
 app.include_router(roles_router, prefix=API_PREFIX)
 app.include_router(invoices_router, prefix=API_PREFIX)
+app.include_router(payments_router, prefix=API_PREFIX)
+app.include_router(recurring_billing_router, prefix=API_PREFIX)
 
 @app.get("/", tags=["Health"])
 async def root():
