@@ -1,7 +1,8 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from app.api.routes.users import router as users_router
+from app.api.routes.roles import router as roles_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.customers import router as customers_router
 from app.api.routes.products import router as products_router
@@ -37,7 +38,8 @@ app.include_router(product_variants_router, prefix=API_PREFIX)
 app.include_router(subscription_plans_router, prefix=API_PREFIX)
 app.include_router(subscriptions_router, prefix=API_PREFIX)
 app.include_router(subscription_lines_router, prefix=API_PREFIX)
-
+app.include_router(users_router, prefix=API_PREFIX)
+app.include_router(roles_router, prefix=API_PREFIX)
 
 @app.get("/", tags=["Health"])
 async def root():
