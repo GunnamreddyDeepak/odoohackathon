@@ -1,8 +1,11 @@
+
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   'http://127.0.0.1:8000/api/v1'
 
-export const getAccessToken = () => localStorage.getItem('access_token')
+export const getAccessToken = () => {
+  return localStorage.getItem('access_token')
+}
 
 export const setAccessToken = (token: string) => {
   localStorage.setItem('access_token', token)
@@ -27,18 +30,15 @@ export async function apiRequest<T>(
     },
   })
 
-  if (response.status === 401) {
-    clearAccessToken()
-
-    if (window.location.pathname !== '/login') {
-      window.location.href = '/login'
-    }
-
-    throw new Error('Session expired. Please log in again.')
-  }
-
   if (!response.ok) {
     const errorText = await response.text()
+
+    if (response.status === 401) {
+      throw new Error(
+        'Authentication required. Please log in to access live data.',
+      )
+    }
+
     throw new Error(errorText || `API error: ${response.status}`)
   }
 
