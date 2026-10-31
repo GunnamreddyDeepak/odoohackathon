@@ -1,55 +1,38 @@
+import { useNavigate } from 'react-router-dom'
 
-const SubscriptionPlans = () => {
+function Login() {
+  const navigate = useNavigate()
+
   return (
-    <div className="min-h-screen bg-[#F7F9FD] p-5 md:p-8">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <p className="text-sm text-slate-400">Subscriptions / Plans</p>
-          <h1 className="mt-2 text-3xl font-bold text-[#101B35]">
-            Subscription Plans
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Create and manage subscription plans and billing frequencies.
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+      <div className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-8 shadow-2xl">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-white">Planora</h1>
+          <p className="mt-2 text-slate-400">
+            Subscription Management System
           </p>
         </div>
 
-        <button
-          disabled
-          title="Plan fields will be finalized with the backend API contract"
-          className="cursor-not-allowed rounded-xl bg-[#5277F7] px-5 py-3 text-sm font-semibold text-white opacity-60"
-        >
-          + Create Plan
-        </button>
-      </div>
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold text-white">
+            Welcome to Planora
+          </h2>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        {['Total Plans', 'Active Plans', 'Inactive Plans'].map((item) => (
-          <div key={item} className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">{item}</p>
-            <p className="mt-3 text-3xl font-bold text-[#101B35]">—</p>
-            <p className="mt-2 text-xs text-slate-400">Awaiting backend data</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-8 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-        <div className="border-b border-slate-100 p-5">
-          <h2 className="text-lg font-bold text-[#101B35]">All Subscription Plans</h2>
-          <p className="mt-1 text-xs text-slate-400">
-            Manage plan details, pricing and billing cycles.
+          <p className="mt-3 text-sm leading-6 text-slate-400">
+            Manage products, subscription plans, subscriptions and quotations
+            from one workspace.
           </p>
-        </div>
 
-        <div className="flex min-h-[320px] flex-col items-center justify-center px-6 py-12 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-3xl">
-            📋
-          </div>
-          <h3 className="mt-5 text-lg font-bold text-[#101B35]">
-            No subscription plans available
-          </h3>
-          <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
-            Your subscription plans will appear here when connected to the
-            backend.
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard')}
+            className="mt-8 w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
+          >
+            Enter Workspace
+          </button>
+
+          <p className="mt-5 text-xs text-slate-500">
+            Hackathon demo access
           </p>
         </div>
       </div>
@@ -57,4 +40,4 @@ const SubscriptionPlans = () => {
   )
 }
 
-export default SubscriptionPlans
+export default Login
