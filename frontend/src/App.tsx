@@ -13,6 +13,7 @@ import Dashboard from './pages/Dashboard'
 import Products from './pages/Products'
 import SubscriptionPlans from './pages/SubscriptionPlans'
 import Subscriptions from './pages/Subscriptions'
+import Invoices from './pages/Invoices'
 import Quotations from './pages/Quotations'
 import Customers from './pages/Customers'
 import Layout from './components/Layout'
@@ -74,6 +75,7 @@ function App() {
               element={<SubscriptionPlans />}
             />
             <Route path="/subscriptions" element={<Subscriptions />} />
+            <Route path="/invoices" element={<Invoices />} />
             <Route path="/quotations" element={<Quotations />} />
             <Route path="/customers" element={<Customers />} />
           </Route>

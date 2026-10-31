@@ -7,6 +7,7 @@ const menuItems = [
   { name: 'Products', path: '/products', icon: '◈' },
   { name: 'Subscription Plans', path: '/subscription-plans', icon: '▤' },
   { name: 'Subscriptions', path: '/subscriptions', icon: '⟳' },
+  { name: 'Invoices & Payments', path: '/invoices', icon: '₹' },
   { name: 'Quotations', path: '/quotations', icon: '▧' },
   { name: 'Customers', path: '/customers', icon: '♙' },
 ]

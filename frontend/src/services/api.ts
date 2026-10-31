@@ -237,3 +237,86 @@ export async function updateSubscriptionStatus(
     },
   )
 }
+// ---------------- INVOICES & PAYMENTS ----------------
+
+export interface InvoiceLine {
+  [key: string]: unknown
+}
+
+export interface Invoice {
+  id: number
+  invoice_number: string
+  customer_id: number
+  subscription_id: number | null
+  issue_date: string
+  due_date: string
+  currency: string
+  subtotal: number | string
+  discount_amount: number | string
+  tax_amount: number | string
+  total: number | string
+  status: string
+  payment_status: string
+  created_at: string
+  updated_at: string
+  lines: InvoiceLine[]
+}
+
+export interface Payment {
+  id: number
+  invoice_id: number
+  amount: number | string
+  payment_method: string
+  payment_date: string
+  reference: string | null
+  note: string | null
+  status: 'RECORDED' | 'REVERSED' | string
+  created_at: string
+  outstanding_balance: number | string
+}
+
+export interface PaymentCreate {
+  amount: number
+  payment_method: string
+  payment_date: string
+  reference?: string | null
+  note?: string | null
+}
+
+export async function getInvoices(): Promise<Invoice[]> {
+  return apiRequest<Invoice[]>('/invoices')
+}
+
+export async function getInvoiceDetails(
+  invoiceId: number,
+): Promise<Invoice> {
+  return apiRequest<Invoice>(`/invoices/${invoiceId}`)
+}
+
+export async function getPaymentHistory(
+  invoiceId: number,
+): Promise<Payment[]> {
+  return apiRequest<Payment[]>(`/invoices/${invoiceId}/payments`)
+}
+
+export async function recordPayment(
+  invoiceId: number,
+  payload: PaymentCreate,
+): Promise<Payment> {
+  return apiRequest<Payment>(`/invoices/${invoiceId}/payments`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function reversePayment(
+  invoiceId: number,
+  paymentId: number,
+): Promise<Payment> {
+  return apiRequest<Payment>(
+    `/invoices/${invoiceId}/payments/${paymentId}/reverse`,
+    {
+      method: 'POST',
+    },
+  )
+}
