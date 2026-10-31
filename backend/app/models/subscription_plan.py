@@ -27,47 +27,34 @@ class SubscriptionPlan(Base):
         ),
     )
 
-    id: Mapped[int] = mapped_column(
-        primary_key=True,
-        index=True,
-    )
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
 
     name: Mapped[str] = mapped_column(
-        String(150),
-        nullable=False,
+        String(150), nullable=False
     )
 
     description: Mapped[str | None] = mapped_column(
-        String(500),
-        nullable=True,
+        String(500), nullable=True
     )
 
     plan_code: Mapped[str] = mapped_column(
-        String(50),
-        unique=True,
-        nullable=False,
-        index=True,
+        String(50), unique=True, nullable=False, index=True
     )
 
     billing_frequency: Mapped[str] = mapped_column(
-        String(20),
-        nullable=False,
+        String(20), nullable=False
     )
 
     base_price: Mapped[Decimal] = mapped_column(
-        Numeric(12, 2),
-        nullable=False,
+        Numeric(12, 2), nullable=False
     )
 
     currency: Mapped[str] = mapped_column(
-        String(3),
-        nullable=False,
+        String(3), nullable=False
     )
 
     is_active: Mapped[bool] = mapped_column(
-        Boolean,
-        default=True,
-        nullable=False,
+        Boolean, default=True, nullable=False
     )
 
     created_at: Mapped[DateTime] = mapped_column(

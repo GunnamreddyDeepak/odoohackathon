@@ -65,3 +65,8 @@ class Customer(Base):
     __table_args__ = (
         Index("ix_customers_full_name", "full_name"),
     )
+    subscriptions = relationship(
+    "Subscription",
+    back_populates="customer",
+    passive_deletes=True,
+)
