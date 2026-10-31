@@ -26,7 +26,7 @@ class Customer(Base):
     )
 
     email: Mapped[str | None] = mapped_column(
-        String(255), unique=True, nullable=True, index=True
+        String(255), unique=True, nullable=False, index=True
     )
 
     phone: Mapped[str | None] = mapped_column(
