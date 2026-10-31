@@ -1,4 +1,9 @@
 from app.models.role import Role
 from app.models.user import User
+from app.models.customer import Customer
 
-__all__ = ["Role", "User"]
+__all__ = [
+    "Role",
+    "User",
+    "Customer",
+]

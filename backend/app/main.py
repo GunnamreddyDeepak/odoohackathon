@@ -1,4 +1,4 @@
-
+from app.api.routes.customers import router as customers_router
 from fastapi import FastAPI
 
 app = FastAPI(
@@ -6,7 +6,7 @@ app = FastAPI(
     description="Backend API for Subscription Management System",
     version="1.0.0",
 )
-
+app.include_router(customers_router, prefix="/api/v1")
 
 @app.get("/", tags=["Health"])
 async def root():
