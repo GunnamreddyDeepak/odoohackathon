@@ -18,9 +18,9 @@ const Layout = () => {
       <aside className="w-full bg-[#0b1930] p-6 text-white lg:min-h-screen lg:w-64">
         <div className="mb-10 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold">
-            S
+            ☆
           </div>
-          <h1 className="text-xl font-bold">Planora</h1>
+          <h1 className="text-xl font-bold">Brightloop Subscription Management System</h1>
         </div>
 
         <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-slate-400">
@@ -66,7 +66,7 @@ const Layout = () => {
           <div>
             <p className="text-xs text-slate-400">SUBSCRIPTION MANAGEMENT</p>
             <h2 className="mt-1 text-lg font-bold text-slate-800">
-              Welcome to Planora
+              Welcome to Brightloop Subscription Management System
             </h2>
           </div>
 
