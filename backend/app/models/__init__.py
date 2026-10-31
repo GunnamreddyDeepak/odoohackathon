@@ -16,4 +16,10 @@ __all__ = [
     "SubscriptionPlan",
     "Subscription",
     "SubscriptionLine",
+    "Invoice",
+    "InvoiceLine",
+    "Payment",
 ]
+from app.models.invoice import Invoice
+from app.models.invoice_line import InvoiceLine
+from app.models.payment import Payment
