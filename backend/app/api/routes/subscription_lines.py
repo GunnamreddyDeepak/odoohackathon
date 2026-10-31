@@ -1,13 +1,17 @@
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.core.database import get_db
+from app.core.dependencies import get_current_user, require_staff
 from app.models import (
     Product,
     ProductVariant,
     Subscription,
     SubscriptionLine,
+    Customer,
+    User,
 )
 from app.schemas.subscription_line import (
     SubscriptionLineCreate,
@@ -16,6 +20,23 @@ from app.schemas.subscription_line import (
 )
 
 router = APIRouter(prefix="/subscriptions", tags=["Subscription Lines"])
+
+
+def verify_subscription_access(
+    subscription: Subscription,
+    current_user: User,
+    db: Session,
+):
+    if current_user.role.name.upper() == "CUSTOMER":
+        customer = db.query(Customer).filter(
+            Customer.user_id == current_user.id
+        ).first()
+
+        if not customer or subscription.customer_id != customer.id:
+            raise HTTPException(
+                status_code=404,
+                detail="Subscription not found",
+            )
 
 
 @router.post(
@@ -27,6 +48,7 @@ def add_subscription_line(
     subscription_id: int,
     data: SubscriptionLineCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(require_staff),
 ):
     subscription = db.query(Subscription).filter(
         Subscription.id == subscription_id
@@ -101,6 +123,7 @@ def add_subscription_line(
 def list_subscription_lines(
     subscription_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     subscription = db.query(Subscription).filter(
         Subscription.id == subscription_id
@@ -108,6 +131,8 @@ def list_subscription_lines(
 
     if not subscription:
         raise HTTPException(status_code=404, detail="Subscription not found")
+
+    verify_subscription_access(subscription, current_user, db)
 
     return (
         db.query(SubscriptionLine)
@@ -126,6 +151,7 @@ def update_subscription_line(
     line_id: int,
     data: SubscriptionLineUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(require_staff),
 ):
     subscription = db.query(Subscription).filter(
         Subscription.id == subscription_id
@@ -151,6 +177,10 @@ def update_subscription_line(
     line.quantity = data.quantity
     line.line_total = line.unit_price * data.quantity
 
-    db.commit()
-    db.refresh(line)
-    return line
+    try:
+        db.commit()
+        db.refresh(line)
+        return line
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Invalid subscription line update")

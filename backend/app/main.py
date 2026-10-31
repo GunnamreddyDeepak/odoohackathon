@@ -1,5 +1,7 @@
+
 from fastapi import FastAPI
 
+from app.api.routes.auth import router as auth_router
 from app.api.routes.customers import router as customers_router
 from app.api.routes.products import router as products_router
 from app.api.routes.product_variants import router as product_variants_router
@@ -16,6 +18,7 @@ app = FastAPI(
 
 API_PREFIX = "/api/v1"
 
+app.include_router(auth_router, prefix=API_PREFIX)
 app.include_router(customers_router, prefix=API_PREFIX)
 app.include_router(products_router, prefix=API_PREFIX)
 app.include_router(product_variants_router, prefix=API_PREFIX)

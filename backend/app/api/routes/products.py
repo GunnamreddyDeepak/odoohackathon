@@ -1,9 +1,11 @@
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.core.database import get_db
-from app.models.product import Product
+from app.core.dependencies import get_current_user, require_staff
+from app.models import Product, User
 from app.schemas.product import (
     ProductCreate,
     ProductUpdate,
@@ -18,16 +20,17 @@ router = APIRouter(prefix="/products", tags=["Products"])
     response_model=ProductResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_product(data: ProductCreate, db: Session = Depends(get_db)):
+def create_product(
+    data: ProductCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_staff),
+):
     existing = db.query(Product).filter(
         Product.product_code == data.product_code
     ).first()
 
     if existing:
-        raise HTTPException(
-            status_code=409,
-            detail="Product code already exists",
-        )
+        raise HTTPException(status_code=409, detail="Product code already exists")
 
     product = Product(**data.model_dump())
 
@@ -49,6 +52,7 @@ def list_products(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     if skip < 0 or limit < 1 or limit > 100:
         raise HTTPException(status_code=400, detail="Invalid pagination")
@@ -63,7 +67,11 @@ def list_products(
 
 
 @router.get("/{product_id}", response_model=ProductResponse)
-def get_product(product_id: int, db: Session = Depends(get_db)):
+def get_product(
+    product_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     product = db.query(Product).filter(
         Product.id == product_id
     ).first()
@@ -79,6 +87,7 @@ def update_product(
     product_id: int,
     data: ProductUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(require_staff),
 ):
     product = db.query(Product).filter(
         Product.id == product_id
@@ -88,6 +97,9 @@ def update_product(
         raise HTTPException(status_code=404, detail="Product not found")
 
     updates = data.model_dump(exclude_unset=True)
+
+    if not updates:
+        raise HTTPException(status_code=400, detail="No update fields provided")
 
     for field, value in updates.items():
         setattr(product, field, value)

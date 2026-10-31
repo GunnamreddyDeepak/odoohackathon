@@ -1,9 +1,11 @@
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.core.database import get_db
-from app.models import SubscriptionPlan
+from app.core.dependencies import get_current_user, require_staff
+from app.models import SubscriptionPlan, User
 from app.schemas.subscription_plan import (
     SubscriptionPlanCreate,
     SubscriptionPlanUpdate,
@@ -21,6 +23,7 @@ router = APIRouter(prefix="/plans", tags=["Subscription Plans"])
 def create_plan(
     plan_data: SubscriptionPlanCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(require_staff),
 ):
     existing_plan = db.query(SubscriptionPlan).filter(
         SubscriptionPlan.plan_code == plan_data.plan_code
@@ -56,6 +59,7 @@ def list_plans(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     if skip < 0 or limit < 1 or limit > 100:
         raise HTTPException(
@@ -79,6 +83,7 @@ def list_plans(
 def get_plan(
     plan_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     plan = db.query(SubscriptionPlan).filter(
         SubscriptionPlan.id == plan_id
@@ -101,6 +106,7 @@ def update_plan(
     plan_id: int,
     plan_data: SubscriptionPlanUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(require_staff),
 ):
     plan = db.query(SubscriptionPlan).filter(
         SubscriptionPlan.id == plan_id
@@ -134,8 +140,3 @@ def update_plan(
         )
 
     return plan
-subscriptions = relationship(
-    "Subscription",
-    back_populates="plan",
-    passive_deletes=True,
-)
