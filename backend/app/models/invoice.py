@@ -55,6 +55,24 @@ class Invoice(Base):
         index=True,
     )
 
+    discount_id: Mapped[int | None] = mapped_column(
+        ForeignKey("discounts.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
+    )
+
+    tax_rule_id: Mapped[int | None] = mapped_column(
+        ForeignKey("tax_rules.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
+    )
+
+    tax_rate: Mapped[Decimal] = mapped_column(
+        Numeric(5, 2),
+        default=Decimal("0.00"),
+        nullable=False,
+    )
+
     issue_date: Mapped[date] = mapped_column(Date, nullable=False)
     due_date: Mapped[date] = mapped_column(Date, nullable=False)
 
@@ -93,6 +111,8 @@ class Invoice(Base):
 
     customer = relationship("Customer")
     subscription = relationship("Subscription")
+    discount = relationship("Discount")
+    tax_rule = relationship("TaxRule")
 
     lines = relationship(
         "InvoiceLine",

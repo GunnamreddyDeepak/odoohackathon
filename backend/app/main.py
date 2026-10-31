@@ -10,7 +10,7 @@ from app.api.routes.product_variants import router as product_variants_router
 from app.api.routes.subscription_plans import router as subscription_plans_router
 from app.api.routes.subscriptions import router as subscriptions_router
 from app.api.routes.subscription_lines import router as subscription_lines_router
-
+from app.api.routes.invoices import router as invoices_router
 
 app = FastAPI(
     title="Brightloop Subscription Management API",
@@ -40,6 +40,7 @@ app.include_router(subscriptions_router, prefix=API_PREFIX)
 app.include_router(subscription_lines_router, prefix=API_PREFIX)
 app.include_router(users_router, prefix=API_PREFIX)
 app.include_router(roles_router, prefix=API_PREFIX)
+app.include_router(invoices_router, prefix=API_PREFIX)
 
 @app.get("/", tags=["Health"])
 async def root():
