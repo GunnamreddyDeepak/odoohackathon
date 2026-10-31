@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes.customers import router as customers_router
 from app.api.routes.products import router as products_router
 from app.api.routes.product_variants import router as product_variants_router
@@ -13,7 +13,13 @@ app = FastAPI(
     description="Backend API for Subscription Management System",
     version="1.0.0",
 )
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 API_PREFIX = "/api/v1"
 
 app.include_router(customers_router, prefix=API_PREFIX)
